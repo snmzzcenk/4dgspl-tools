@@ -43,7 +43,7 @@ Use this workflow when a user asks for any of the following:
    - It creates the project, uploads every `camNN.mp4` and the calibration through signed URLs (≤ 50 MB per file), submits, polls the status and downloads the result.
    - Without `--gonder` it only uploads, so the user can review and submit in the dashboard.
    - Other modes: `--projeler`, `--durum <id>`, `--sonuc <id> --indir dir`.
-   - API (if you need it directly): `POST https://ghueniqorletddbvxlmr.supabase.co/functions/v1/ajan` with `Authorization: Bearer 4dg_…` and a JSON body `{"islem": …}`. Operations: `proje_ac`, `yukleme_adresi`, `dosya_kaydet`, `gonder`, `durum`, `sonuc`, `projeler`. GET returns usage.
+   - API (if you need it directly): `POST https://ghueniqorletddbvxlmr.supabase.co/functions/v1/ajan` with headers `x-4dgspl-anahtar: 4dg_…` plus `Authorization: Bearer <anon>` and `apikey: <anon>` (the site's public anon key, `SUPABASE_ANON_KEY` in https://4dgspl.at/assets/config.js), JSON body `{"islem": …}`. Operations: `proje_ac`, `yukleme_adresi`, `dosya_kaydet`, `gonder`, `durum`, `sonuc`, `projeler`. GET with the anon key returns usage.
    - Limits:
      - 20 projects created and 10 submitted per 24 h;
      - at most 3 queued or processing at once;

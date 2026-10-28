@@ -32,6 +32,8 @@ import urllib.request
 from pathlib import Path
 
 API = "https://ghueniqorletddbvxlmr.supabase.co/functions/v1/ajan"
+# Supabase kapısı herkese açık anon anahtarını ister; sitenin yapılandırmasından okunur (DGSPL_ANON ile verilebilir)
+YAPILANDIRMA = "https://4dgspl.at/assets/config.js"
 ETIKET = re.compile(r"^(cam\d{2})(?:_.*)?$", re.I)
 KALIB_ADLARI = ("kalibrasyon.zip", "calibration.zip")
 DIL = "en"
@@ -45,10 +47,29 @@ class ApiHatasi(Exception):
     pass
 
 
+_ANON = []
+
+
+def anon_anahtari():
+    if not _ANON:
+        a = os.environ.get("DGSPL_ANON", "").strip()
+        if not a:
+            with urllib.request.urlopen(urllib.request.Request(YAPILANDIRMA, headers={"User-Agent": "4dgspl_yukle/1"}),
+                                        timeout=30) as y:
+                bul = re.search(r'SUPABASE_ANON_KEY\s*=\s*"([^"]+)"', y.read().decode())
+            if not bul:
+                raise ApiHatasi(m("Sitenin anon anahtarı okunamadı", "Could not read the site's anon key"))
+            a = bul.group(1)
+        _ANON.append(a)
+    return _ANON[0]
+
+
 def cagir(api, anahtar, islem, **alanlar):
     govde = json.dumps({"islem": islem, **alanlar}).encode()
+    anon = anon_anahtari()
     istek = urllib.request.Request(api, data=govde, method="POST", headers={
-        "Authorization": f"Bearer {anahtar}", "Content-Type": "application/json", "User-Agent": "4dgspl_yukle/1"})
+        "Authorization": f"Bearer {anon}", "apikey": anon, "x-4dgspl-anahtar": anahtar,
+        "Content-Type": "application/json", "User-Agent": "4dgspl_yukle/1"})
     for deneme in range(4):
         try:
             with urllib.request.urlopen(istek, timeout=120) as y:
