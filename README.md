@@ -1,0 +1,46 @@
+# 4dgspl-tools
+
+Open tools for making **4D Gaussian Splatting (4DGS)** content with [4dgspl.at](https://4dgspl.at/en/). Turn a 3D model, an animated character (for example from Mixamo) or a Blender scene into a synchronized multi-camera render with exact COLMAP calibration, validate it, and convert it to a 4DGS sequence that plays in the browser.
+
+Built to be used by **AI coding agents** (Claude Code, Codex, …) as well as people. Agents: start with [AGENTS.md](AGENTS.md).
+
+| Tool | What it does |
+|---|---|
+| [`tools/4dgspl_blender_rig.py`](tools/4dgspl_blender_rig.py) | Blender: builds a 4–16 camera ring (8 recommended, two heights) around the scene, renders `cam00.mp4 …` from every camera and writes COLMAP `cameras.txt` + `images.txt` (`kalibrasyon.zip`). Pure black world by default. |
+| [`tools/4dgspl_kontrol.py`](tools/4dgspl_kontrol.py) | Dependency-free pre-upload checker. It checks video names, resolution, fps and frame count, the calibration format and pixel units, whether the cameras look at a common centre, height variety and ring gaps, and a black background. `--json` output; exit code 1 on errors. |
+
+## Quick start
+
+```bash
+# 1. Camera ring + render + calibration (Blender 4.x)
+blender -b scene.blend -P tools/4dgspl_blender_rig.py -- --kamera 8 --yaricap 3.5 --cikti //teslim --render
+
+# 2. Validate
+python3 tools/4dgspl_kontrol.py teslim
+
+# 3. Upload teslim/cam00.mp4 … and teslim/kalibrasyon.zip at https://4dgspl.at/panel.html
+```
+
+Rules that matter most:
+- **Background:** pure black world (0, 0, 0).
+- **Materials:** matte.
+- **Cameras:** at least 6, 8 recommended; they never move.
+- **Timing:** the key motion within the first 4 seconds.
+- **Framing:** the subject fills 70–85 % of the frame height.
+
+Details: [agent guide](https://4dgspl.at/en/agents.html) · [capture guide](https://4dgspl.at/en/capture.html) · [examples](https://4dgspl.at/en/examples.html) · [llms.txt](https://4dgspl.at/llms.txt)
+
+## Output
+
+4dgspl.at reconstructs every frame as a 3D Gaussian Splatting scene ([gsplat](https://github.com/nerfstudio-project/gsplat)). The output is:
+- a `compressed.ply` sequence in PlayCanvas format;
+- `sahne.json` with the frame count, fps, start camera and metrics;
+- an MP4 preview.
+
+Play the sequence in the browser with PlayCanvas, or open a single frame in SuperSplat.
+
+## Türkçe
+
+4dgspl.at ile 4D Gaussian Splatting içeriği üretmek için açık araçlar. Blender rig betiği 4–16 kameralı halkayı kurar, her kameradan render alır ve COLMAP kalibrasyonunu yazar. Denetleyici, teslimi yüklemeden önce motorun kurallarına göre kontrol eder (`--dil tr`). Yapay zekâ ajanları için iş akışı: https://4dgspl.at/ajan.html
+
+The tools in this repository are copies of https://4dgspl.at/araclar/; the site is the source and they are kept in sync. MIT license.
