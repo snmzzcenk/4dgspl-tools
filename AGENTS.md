@@ -33,11 +33,22 @@ Use this workflow when a user asks for any of the following:
    ```
    - The script needs no dependencies; with ffprobe/ffmpeg it also checks the videos and the background.
    - Exit code 1 means fix before upload.
-6. **Upload.**
-   - Uploads currently go through the web dashboard at https://4dgspl.at/panel.html.
-   - Create a new project with the camera count, put `camNN.mp4` into the camera slots in order, upload `kalibrasyon.zip` as calibration and submit.
-   - If you have a browser tool and the user is signed in, you may do this yourself. Otherwise give the user these steps and the path of the delivery folder.
-   - A direct upload key for agents is in preparation.
+6. **Upload, submit, wait, download.**
+   - The user creates an agent key at https://4dgspl.at/panel.html → "Ajan anahtarları" (agent keys).
+   - The user passes it to you as the `DGSPL_ANAHTAR` environment variable. Never write the key into chat, files or logs.
+   ```bash
+   python3 tools/4dgspl_yukle.py teslim --baslik "Dancing robot" --gonder --bekle --indir result
+   ```
+   - The client runs the checker first and stops on errors.
+   - It creates the project, uploads every `camNN.mp4` and the calibration through signed URLs (≤ 50 MB per file), submits, polls the status and downloads the result.
+   - Without `--gonder` it only uploads, so the user can review and submit in the dashboard.
+   - Other modes: `--projeler`, `--durum <id>`, `--sonuc <id> --indir dir`.
+   - API (if you need it directly): `POST https://ghueniqorletddbvxlmr.supabase.co/functions/v1/ajan` with `Authorization: Bearer 4dg_…` and a JSON body `{"islem": …}`. Operations: `proje_ac`, `yukleme_adresi`, `dosya_kaydet`, `gonder`, `durum`, `sonuc`, `projeler`. GET returns usage.
+   - Limits:
+     - 20 projects created and 10 submitted per 24 h;
+     - at most 3 queued or processing at once;
+     - 5 active keys per user.
+   - No key: the user uploads in the web dashboard at https://4dgspl.at/panel.html.
 7. **Result.**
    - One `compressed.ply` 3D Gaussian scene per frame (PlayCanvas format), plus `sahne.json` and an MP4 preview.
    - The project page has a player, a share link and a ZIP download.

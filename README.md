@@ -7,6 +7,7 @@ Built to be used by **AI coding agents** (Claude Code, Codex, …) as well as pe
 | Tool | What it does |
 |---|---|
 | [`tools/4dgspl_blender_rig.py`](tools/4dgspl_blender_rig.py) | Blender: builds a 4–16 camera ring (8 recommended, two heights) around the scene, renders `cam00.mp4 …` from every camera and writes COLMAP `cameras.txt` + `images.txt` (`kalibrasyon.zip`). Pure black world by default. |
+| [`tools/4dgspl_yukle.py`](tools/4dgspl_yukle.py) | Dependency-free upload client for an agent key (`DGSPL_ANAHTAR`). It validates, creates a project, uploads, submits, waits and downloads the per-frame 3DGS result: `--gonder --bekle --indir result`. |
 | [`tools/4dgspl_kontrol.py`](tools/4dgspl_kontrol.py) | Dependency-free pre-upload checker. It checks video names, resolution, fps and frame count, the calibration format and pixel units, whether the cameras look at a common centre, height variety and ring gaps, and a black background. `--json` output; exit code 1 on errors. |
 
 ## Quick start
@@ -18,7 +19,9 @@ blender -b scene.blend -P tools/4dgspl_blender_rig.py -- --kamera 8 --yaricap 3.
 # 2. Validate
 python3 tools/4dgspl_kontrol.py teslim
 
-# 3. Upload teslim/cam00.mp4 … and teslim/kalibrasyon.zip at https://4dgspl.at/panel.html
+# 3. Upload, process and download with your agent key (4dgspl.at → Projelerim → Ajan anahtarları)
+export DGSPL_ANAHTAR=4dg_…
+python3 tools/4dgspl_yukle.py teslim --gonder --bekle --indir result
 ```
 
 Rules that matter most:
