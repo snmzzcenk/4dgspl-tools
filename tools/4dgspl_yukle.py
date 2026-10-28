@@ -180,6 +180,57 @@ def sonucu_indir(api, anahtar, pid, hedef):
             f"Result downloaded: {hedef} ({len(s['kareler'])} frames, sahne.json, onizleme.mp4). Project page: {s['proje_sayfasi']}"))
 
 
+def klasoru_yukle(api, anahtar, klasor, baslik=None, kalite="hizli", notlar=None, zorla=False):
+    """Klasörü denetler, proje açar, videoları ve kalibrasyonu yükler; proje_ac yanıtını döndürür. Hata: ApiHatasi."""
+    klasor = Path(klasor)
+    if not klasor.is_dir():
+        raise ApiHatasi(m(f"{klasor} bir klasör değil", f"{klasor} is not a folder"))
+    videolar, kalib = klasoru_oku(klasor)
+    etiketler = sorted(videolar)
+    if not etiketler or etiketler != [f"cam{i:02d}" for i in range(len(etiketler))]:
+        raise ApiHatasi(m(f"{klasor} içinde cam00'dan başlayan ardışık videolar yok: {etiketler}",
+                          f"{klasor} has no consecutive videos starting at cam00: {etiketler}"))
+    fps = None
+    bilgi = {}
+    mod = denetleyici()
+    if mod:
+        mod.DIL = DIL
+        rapor, bilgi = mod.denetle(klasor, kalib)
+        for d, t in rapor.satirlar:
+            print({"HATA": "✗", "UYARI": "!", "TAMAM": "✓"}[d], t)
+        if rapor.hatali and not zorla:
+            raise ApiHatasi(m("Denetleyici hata buldu; düzeltin ya da --zorla kullanın.", "The checker found errors; fix them or use --zorla."))
+        fps = next(iter(bilgi.values()), {}).get("fps")
+    else:
+        print(m("! 4dgspl_kontrol.py bu betiğin yanında yok; denetim atlandı (https://4dgspl.at/araclar/4dgspl_kontrol.py).",
+                "! 4dgspl_kontrol.py is not next to this script; validation skipped (https://4dgspl.at/araclar/4dgspl_kontrol.py)."))
+    for v in list(videolar.values()) + ([kalib] if kalib else []):
+        if v.stat().st_size > 50 * 1024 * 1024:
+            raise ApiHatasi(m(f"{v.name} 50 MB'tan büyük; bit hızını düşürün (ör. ffmpeg -crf 23).",
+                              f"{v.name} is larger than 50 MB; lower the bitrate (e.g. ffmpeg -crf 23)."))
+
+    p = cagir(api, anahtar, "proje_ac", baslik=baslik or klasor.resolve().name, kamera_sayisi=len(etiketler),
+              fps=round(fps) if fps else None, kalite=kalite, notlar=notlar)
+    pid = p["proje_id"]
+    print(m(f"Proje açıldı: {pid} · {p['proje_sayfasi']}", f"Project created: {pid} · {p['proje_sayfasi']}"))
+    isler = [("video", e, videolar[e]) for e in etiketler] + ([("kalibrasyon", None, kalib)] if kalib else [])
+    for tur, kamera, yol in isler:
+        adres = cagir(api, anahtar, "yukleme_adresi", proje_id=pid, tur=tur, kamera=kamera, dosya_adi=yol.name,
+                      boyut=yol.stat().st_size)
+        dosya_yukle(adres["url"], yol, tur)
+        sure = (bilgi.get(kamera) or {}).get("sure") if kamera else None
+        cagir(api, anahtar, "dosya_kaydet", proje_id=pid, tur=tur, kamera=kamera, yol=adres["yol"], dosya_adi=yol.name,
+              **({"sure_sn": round(sure, 2)} if sure else {}))
+        print(f"  ✓ {kamera or m('kalibrasyon', 'calibration')}  {yol.name}  {yol.stat().st_size / 2**20:.1f} MB", flush=True)
+    return p
+
+
+def gonder_metni(g):
+    ucret = {"kredi": m(f", {g.get('ucret')} kredi düştü, bakiye {g.get('bakiye')}", f", {g.get('ucret')} credits charged, balance {g.get('bakiye')}"),
+             "ucretsiz": m(", ücretsiz işlem hakkıyla", ", using a free job"), "ekip": ""}.get(g.get("yol"), "")
+    return m(f"İşleme gönderildi (kuyrukta {g.get('sira')}. sırada{ucret}).", f"Submitted (queue position {g.get('sira')}{ucret}).")
+
+
 def main():
     global DIL
     ap = argparse.ArgumentParser(description="4dgspl.at upload client / yükleme istemcisi")
@@ -218,47 +269,13 @@ def main():
             return
         if not a.klasor:
             ap.error(m("klasör gerekli (ya da --projeler / --durum / --sonuc)", "folder required (or --projeler / --durum / --sonuc)"))
-        klasor = Path(a.klasor)
-        videolar, kalib = klasoru_oku(klasor)
-        etiketler = sorted(videolar)
-        if not etiketler or etiketler != [f"cam{i:02d}" for i in range(len(etiketler))]:
-            sys.exit(m(f"{klasor} içinde cam00'dan başlayan ardışık videolar yok: {etiketler}",
-                       f"{klasor} has no consecutive videos starting at cam00: {etiketler}"))
-        fps = None
-        mod = denetleyici()
-        if mod:
-            mod.DIL = DIL
-            rapor, bilgi = mod.denetle(klasor, kalib)
-            for d, t in rapor.satirlar:
-                print({"HATA": "✗", "UYARI": "!", "TAMAM": "✓"}[d], t)
-            if rapor.hatali and not a.zorla:
-                sys.exit(m("Denetleyici hata buldu; düzeltin ya da --zorla kullanın.", "The checker found errors; fix them or use --zorla."))
-            fps = next(iter(bilgi.values()), {}).get("fps")
-        else:
-            print(m("! 4dgspl_kontrol.py bu betiğin yanında yok; denetim atlandı (https://4dgspl.at/araclar/4dgspl_kontrol.py).",
-                    "! 4dgspl_kontrol.py is not next to this script; validation skipped (https://4dgspl.at/araclar/4dgspl_kontrol.py)."))
-        for v in list(videolar.values()) + ([kalib] if kalib else []):
-            if v.stat().st_size > 50 * 1024 * 1024:
-                sys.exit(m(f"{v.name} 50 MB'tan büyük; bit hızını düşürün (ör. ffmpeg -crf 23).",
-                           f"{v.name} is larger than 50 MB; lower the bitrate (e.g. ffmpeg -crf 23)."))
-
-        p = cagir(a.api, anahtar, "proje_ac", baslik=a.baslik or klasor.resolve().name, kamera_sayisi=len(etiketler),
-                  fps=round(fps) if fps else None, kalite=a.kalite, notlar=a.notlar)
+        p = klasoru_yukle(a.api, anahtar, a.klasor, a.baslik, a.kalite, a.notlar, a.zorla)
         pid = p["proje_id"]
-        print(m(f"Proje açıldı: {pid} · {p['proje_sayfasi']}", f"Project created: {pid} · {p['proje_sayfasi']}"))
-        isler = [("video", e, videolar[e]) for e in etiketler] + ([("kalibrasyon", None, kalib)] if kalib else [])
-        for tur, kamera, yol in isler:
-            adres = cagir(a.api, anahtar, "yukleme_adresi", proje_id=pid, tur=tur, kamera=kamera, dosya_adi=yol.name,
-                          boyut=yol.stat().st_size)
-            dosya_yukle(adres["url"], yol, tur)
-            cagir(a.api, anahtar, "dosya_kaydet", proje_id=pid, tur=tur, kamera=kamera, yol=adres["yol"], dosya_adi=yol.name)
-            print(f"  ✓ {kamera or m('kalibrasyon', 'calibration')}  {yol.name}  {yol.stat().st_size / 2**20:.1f} MB", flush=True)
         if not a.gonder:
             print(m(f"Yüklendi. Göndermek için: panelden \"İşleme gönder\" ya da bu komutu --gonder ile çalıştırın. {p['proje_sayfasi']}",
                     f"Uploaded. To submit: \"İşleme gönder\" in the dashboard, or re-run with --gonder. {p['proje_sayfasi']}"))
             return
-        g = cagir(a.api, anahtar, "gonder", proje_id=pid)
-        print(m(f"İşleme gönderildi (kuyrukta {g.get('sira')}. sırada).", f"Submitted (queue position {g.get('sira')})."))
+        print(gonder_metni(cagir(a.api, anahtar, "gonder", proje_id=pid)))
         if a.bekle or a.indir:
             d = bekle(a.api, anahtar, pid, a.bekle_dk)
             if d and d["durum"] == "tamamlandi" and a.indir:

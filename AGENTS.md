@@ -53,6 +53,10 @@ Use this workflow when a user asks for any of the following:
    - One `compressed.ply` 3D Gaussian scene per frame (PlayCanvas format), plus `sahne.json` and an MP4 preview.
    - The project page has a player, a share link and a ZIP download.
 
+## MCP server (optional)
+
+If the user prefers tools over shell commands, install the MCP server in `tools/4dgspl_mcp.py` (see README → MCP server). It exposes the same workflow as `get_4dgs_guide`, `check_delivery`, `upload_project`, `submit_project`, `project_status`, `list_projects` and `download_result`; the key goes into the server's environment as `DGSPL_ANAHTAR`, never into chat.
+
 ## Do not
 
 - Generate camera views with text-to-video models; they have no consistent geometry or known poses.

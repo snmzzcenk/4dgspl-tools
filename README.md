@@ -8,6 +8,7 @@ Built to be used by **AI coding agents** (Claude Code, Codex, …) as well as pe
 |---|---|
 | [`tools/4dgspl_blender_rig.py`](tools/4dgspl_blender_rig.py) | Blender: builds a 4–16 camera ring (8 recommended, two heights) around the scene, renders `cam00.mp4 …` from every camera and writes COLMAP `cameras.txt` + `images.txt` (`kalibrasyon.zip`). Pure black world by default. |
 | [`tools/4dgspl_yukle.py`](tools/4dgspl_yukle.py) | Dependency-free upload client for an agent key (`DGSPL_ANAHTAR`). It validates, creates a project, uploads, submits, waits and downloads the per-frame 3DGS result: `--gonder --bekle --indir result`. |
+| [`tools/4dgspl_mcp.py`](tools/4dgspl_mcp.py) | Dependency-free **MCP server** (stdio). Claude Code, Codex, Cursor or Claude Desktop get 4dgspl.at as tools: `get_4dgs_guide`, `check_delivery`, `upload_project`, `submit_project`, `project_status`, `list_projects`, `download_result`. |
 | [`tools/4dgspl_kontrol.py`](tools/4dgspl_kontrol.py) | Dependency-free pre-upload checker. It checks video names, resolution, fps and frame count, the calibration format and pixel units, whether the cameras look at a common centre, height variety and ring gaps, and a black background. `--json` output; exit code 1 on errors. |
 
 ## Quick start
@@ -32,6 +33,22 @@ Rules that matter most:
 - **Framing:** the subject fills 70–85 % of the frame height.
 
 Details: [agent guide](https://4dgspl.at/en/agents.html) · [capture guide](https://4dgspl.at/en/capture.html) · [examples](https://4dgspl.at/en/examples.html) · [llms.txt](https://4dgspl.at/llms.txt)
+
+## MCP server
+
+```bash
+mkdir -p ~/.4dgspl && cd ~/.4dgspl && curl -O https://4dgspl.at/araclar/4dgspl_mcp.py \
+  -O https://4dgspl.at/araclar/4dgspl_yukle.py -O https://4dgspl.at/araclar/4dgspl_kontrol.py
+claude mcp add 4dgspl --env DGSPL_ANAHTAR=4dg_… -- python3 ~/.4dgspl/4dgspl_mcp.py   # Claude Code
+codex mcp add 4dgspl --env DGSPL_ANAHTAR=4dg_… -- python3 ~/.4dgspl/4dgspl_mcp.py    # Codex
+```
+
+- Claude Desktop: install `4dgspl.mcpb` from the [latest release](https://github.com/snmzzcenk/4dgspl-tools/releases/latest) and enter the key in its settings.
+- Other clients: command `python3`, argument the path to `4dgspl_mcp.py`, environment `DGSPL_ANAHTAR`.
+- Without a key, `get_4dgs_guide` and `check_delivery` still work.
+- Listed in the MCP Registry as `io.github.snmzzcenk/4dgspl` ([server.json](server.json)). Build the bundle with `python3 mcpb/build.py`.
+
+<!-- mcp-name: io.github.snmzzcenk/4dgspl -->
 
 ## Output
 

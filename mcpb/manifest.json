@@ -1,0 +1,43 @@
+{
+  "manifest_version": "0.3",
+  "name": "4dgspl",
+  "display_name": "4dgspl.at — 4D Gaussian Splatting",
+  "version": "0.1.0",
+  "description": "Turn synchronized multi-camera video or a Blender multi-camera render into 4D Gaussian Splatting (4DGS) on 4dgspl.at: validate, upload, process, download.",
+  "long_description": "4dgspl.at converts synchronized video of the same moment from 4–16 cameras (or virtual cameras in Blender, Unreal or Unity) plus COLMAP calibration into a 4D Gaussian Splatting sequence that plays in the browser and can be watched from any angle. This server lets an AI assistant explain the capture rules, validate a delivery folder, create a project, upload the videos and calibration, submit it, follow its progress and download the per-frame 3DGS PLY files. New accounts get 5 free jobs.",
+  "author": {"name": "4dgspl.at", "email": "hello@4dgspl.at", "url": "https://4dgspl.at/en/"},
+  "homepage": "https://4dgspl.at/en/agents.html",
+  "documentation": "https://4dgspl.at/en/agents.html",
+  "support": "https://github.com/snmzzcenk/4dgspl-tools/issues",
+  "repository": {"type": "git", "url": "https://github.com/snmzzcenk/4dgspl-tools"},
+  "license": "MIT",
+  "keywords": ["4d-gaussian-splatting", "4dgs", "gaussian-splatting", "volumetric-video", "blender", "colmap", "3d"],
+  "server": {
+    "type": "python",
+    "entry_point": "server/4dgspl_mcp.py",
+    "mcp_config": {
+      "command": "python3",
+      "args": ["${__dirname}/server/4dgspl_mcp.py"],
+      "env": {"DGSPL_ANAHTAR": "${user_config.agent_key}"}
+    }
+  },
+  "tools": [
+    {"name": "get_4dgs_guide", "description": "How to make a 4DGS scene with 4dgspl.at: input rules, Blender rig command, pricing, workflow"},
+    {"name": "check_delivery", "description": "Validate a local folder of camNN.mp4 videos and calibration before upload"},
+    {"name": "upload_project", "description": "Create a project, upload the videos and calibration, optionally submit"},
+    {"name": "submit_project", "description": "Submit an uploaded draft for processing"},
+    {"name": "project_status", "description": "Queue position, stage and progress of a project"},
+    {"name": "list_projects", "description": "List the user's projects"},
+    {"name": "download_result", "description": "Download per-frame 3DGS PLY files, sahne.json and an MP4 preview"}
+  ],
+  "user_config": {
+    "agent_key": {
+      "type": "string",
+      "title": "4dgspl.at agent key",
+      "description": "Create it at https://4dgspl.at/panel.html → \"Ajan anahtarları\" (agent keys). Needed for upload, status and download; the guide and checker work without it.",
+      "sensitive": true,
+      "required": false
+    }
+  },
+  "compatibility": {"platforms": ["darwin", "win32", "linux"], "runtimes": {"python": ">=3.8"}}
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.snmzzcenk/4dgspl",
+  "title": "4dgspl.at — 4D Gaussian Splatting",
+  "description": "Turn multi-camera video or a Blender multi-camera render into 4D Gaussian Splatting (4DGS) on 4dgspl.at.",
+  "websiteUrl": "https://4dgspl.at/en/agents.html",
+  "repository": {"url": "https://github.com/snmzzcenk/4dgspl-tools", "source": "github"},
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/snmzzcenk/4dgspl-tools/releases/download/v0.1.0/4dgspl.mcpb",
+      "version": "0.1.0",
+      "fileSha256": "da4761c33c4750b77cfce1e1df344ddba44adbd216e53d1f99ff55890cb1fa01",
+      "transport": {"type": "stdio"},
+      "environmentVariables": [
+        {"name": "DGSPL_ANAHTAR", "description": "4dgspl.at agent key (https://4dgspl.at/panel.html → Ajan anahtarları). Needed for upload, status and download; the guide and checker work without it.", "isSecret": true, "isRequired": false, "format": "string"}
+      ]
+    }
+  ]
+}
