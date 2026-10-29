@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.snmzzcenk/4dgspl",
   "title": "4dgspl.at — 4D Gaussian Splatting",
-  "description": "Turn multi-camera video or a Blender multi-camera render into 4D Gaussian Splatting (4DGS) on 4dgspl.at.",
+  "description": "Turn multi-camera video or Blender renders into 4D Gaussian Splatting (4DGS) on 4dgspl.at.",
   "websiteUrl": "https://4dgspl.at/en/agents.html",
   "repository": {
     "url": "https://github.com/snmzzcenk/4dgspl-tools",
