@@ -232,9 +232,9 @@ def denetle(klasor, kalib_yolu=None):
             b0 = next(iter(bilgi.values()))
             r.tamam(f"Videolar: {b0['W']}×{b0['H']}, {b0['fps']} fps, {b0['kare']} kare, {b0['sure']:.1f} sn.",
                     f"Videos: {b0['W']}×{b0['H']}, {b0['fps']} fps, {b0['kare']} frames, {b0['sure']:.1f} s.")
-            if b0["sure"] > 4.2:
-                r.uyari("İşleme sunucusu şu an her çekimin ilk 4 saniyesini işliyor; önemli hareket ilk 4 saniyede olsun.",
-                        "The processing server currently uses the first 4 seconds of each capture; keep the key motion there.")
+            if b0["sure"] > 10.2:
+                r.uyari("İşleme sunucusu şu an her çekimin en çok ilk 10 saniyesini işliyor; önemli hareket ilk 10 saniyede olsun.",
+                        "The processing server currently uses up to the first 10 seconds of each capture; keep the key motion there.")
     else:
         r.uyari("ffprobe bulunamadı; çözünürlük/fps/kare sayısı denetlenmedi.", "ffprobe not found; resolution/fps/frame count not checked.")
 

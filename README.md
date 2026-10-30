@@ -29,7 +29,7 @@ Rules that matter most:
 - **Background:** pure black world (0, 0, 0).
 - **Materials:** matte.
 - **Cameras:** at least 6, 8 recommended; they never move.
-- **Timing:** the key motion within the first 4 seconds.
+- **Timing:** the key motion within the first 10 seconds.
 - **Framing:** the subject fills 70–85 % of the frame height.
 
 Details: [agent guide](https://4dgspl.at/en/agents.html) · [capture guide](https://4dgspl.at/en/capture.html) · [examples](https://4dgspl.at/en/examples.html) · [llms.txt](https://4dgspl.at/llms.txt)

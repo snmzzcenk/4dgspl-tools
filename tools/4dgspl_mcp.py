@@ -51,7 +51,7 @@ browser and can be watched from any angle. Docs: https://4dgspl.at/en/agents.htm
 Input (one folder): cam00.mp4, cam01.mp4 … (4–16 cameras, 8 recommended, same resolution/fps/frame count, synchronized,
 cameras never move) + kalibrasyon.zip with COLMAP cameras.txt (PINHOLE, pixels) and images.txt (world→camera, OpenCV),
 image names cam00.png … Pure black background (0,0,0) for synthetic scenes; matte materials; subject fills 70–85 % of the
-frame height. The server currently processes the first 4 seconds at 15 fps (60 frames). ≤ 50 MB per file.
+frame height. The server currently processes up to the first 10 seconds at 15 fps (up to 150 frames). ≤ 50 MB per file.
 
 No cameras? Build the scene in Blender and let the rig script make the capture:
   curl -O https://4dgspl.at/araclar/4dgspl_blender_rig.py

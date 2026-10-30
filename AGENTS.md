@@ -14,7 +14,7 @@ Use this workflow when a user asks for any of the following:
    - Simple figure or object: build it with `bpy`.
    - Realistic animated human: download a character together with its animation from https://www.mixamo.com (FBX, With Skin, 30 fps; needs the user's Adobe session) or import the user's glTF/FBX/.blend.
    - Metres, model at the origin, feet at z = 0, motion stays near the origin.
-   - Put the important motion in the **first 4 seconds**: the processing server currently uses the first 4 s at 15 fps.
+   - Put the important motion in the **first 10 seconds**: the processing server currently uses up to the first 10 s at 15 fps.
 3. **Make it 4DGS-friendly.**
    - World colour pure black `(0, 0, 0)`, no floor. Grey turns into fog: linear 0.05 is about 25 % grey on screen.
    - Matte materials: Roughness ≥ 0.6, Specular IOR Level ≤ 0.2, Metallic 0, Coat 0.
