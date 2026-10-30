@@ -258,10 +258,12 @@ def denetle(klasor, kalib_yolu=None):
                 kalib_yolu = klasor / ad
                 break
     if kalib_yolu is None:
-        r.uyari("Kalibrasyon dosyası yok (kalibrasyon.zip / calibration.zip). 4dgspl.at görüntülerden COLMAP ile kalibre "
-                "etmeyi dener; sentetik çekimde kalibrasyonu kamera verisinden yazmak çok daha güvenilir.",
-                "No calibration file (kalibrasyon.zip / calibration.zip). 4dgspl.at will try COLMAP on the images; for "
-                "synthetic captures writing calibration from the camera data is far more reliable.")
+        r.uyari("Kalibrasyon dosyası yok (kalibrasyon.zip / calibration.zip). Dosya olmadan proje ancak --colmap ile gönderilebilir: "
+                "sunucu görüntülerden hesaplamayı dener (en az 7–8 kamera, komşular en çok 45°, dokulu sahne; 6 ve altında çoğunlukla durur). "
+                "Sentetik çekimde kalibrasyonu kamera verisinden yazmak çok daha güvenilir.",
+                "No calibration file (kalibrasyon.zip / calibration.zip). Without one a project can only be submitted with --colmap: "
+                "the server tries to estimate it from the images (7–8+ cameras at most 45° apart, textured scene; 6 or fewer usually fail). "
+                "For synthetic captures writing calibration from the camera data is far more reliable.")
         return r, bilgi
     try:
         kameralar = kalibrasyon_oku(kalib_yolu)

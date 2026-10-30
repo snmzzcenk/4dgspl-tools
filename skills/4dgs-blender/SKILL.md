@@ -106,7 +106,7 @@ With an agent key, which the user creates at https://4dgspl.at/panel.html and pa
 python3 4dgspl_yukle.py teslim --baslik "Dancing robot" --gonder --bekle --indir result
 ```
 
-Without `--gonder` it only uploads, so the user can review and submit in the dashboard. Never write the key into chat, files or logs. Without a key, the user uploads `camNN.mp4` and `kalibrasyon.zip` in the dashboard. Each file can be at most 50 MB.
+Without `--gonder` it only uploads, so the user can review and submit in the dashboard. No calibration file (real footage only): add `--colmap` and the server tries to estimate it from the images (8+ cameras at most 45° apart, textured scene; 6 or fewer usually fail). Never write the key into chat, files or logs. Without a key, the user uploads `camNN.mp4` and `kalibrasyon.zip` in the dashboard. Each file can be at most 50 MB.
 
 The result is a per-frame `compressed.ply` sequence, `sahne.json` and an MP4 preview, with a player, share link, embed code and ZIP download on the project page.
 

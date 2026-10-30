@@ -41,7 +41,7 @@ Use this workflow when a user asks for any of the following:
    ```
    - The client runs the checker first and stops on errors.
    - It creates the project, uploads every `camNN.mp4` and the calibration through signed URLs (≤ 50 MB per file), submits, polls the status and downloads the result.
-   - Without `--gonder` it only uploads, so the user can review and submit in the dashboard.
+   - Without `--gonder` it only uploads, so the user can review and submit in the dashboard. No calibration file (real footage only): add `--colmap` and the server tries to estimate it from the images (8+ cameras at most 45° apart, textured scene; 6 or fewer usually fail).
    - Other modes: `--projeler`, `--durum <id>`, `--sonuc <id> --indir dir`.
    - API (if you need it directly): `POST https://ghueniqorletddbvxlmr.supabase.co/functions/v1/ajan` with headers `x-4dgspl-anahtar: 4dg_…` plus `Authorization: Bearer <anon>` and `apikey: <anon>` (the site's public anon key, `SUPABASE_ANON_KEY` in https://4dgspl.at/assets/config.js), JSON body `{"islem": …}`. Operations: `proje_ac`, `yukleme_adresi`, `dosya_kaydet`, `gonder`, `durum`, `sonuc`, `projeler`. GET with the anon key returns usage.
    - Limits:

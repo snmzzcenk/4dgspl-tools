@@ -8,13 +8,13 @@
     "url": "https://github.com/snmzzcenk/4dgspl-tools",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/snmzzcenk/4dgspl-tools/releases/download/v0.1.0/4dgspl.mcpb",
-      "version": "0.1.0",
-      "fileSha256": "15dd6809af154053ce01b774d0b5d4189ff5ddf76dfe9ae13933ce94876d753b",
+      "identifier": "https://github.com/snmzzcenk/4dgspl-tools/releases/download/v0.1.1/4dgspl.mcpb",
+      "version": "0.1.1",
+      "fileSha256": "9d437d1963dfe475aa01cf13fdf7f946707a1f50db09c0947482d3bc6e76867f",
       "transport": {
         "type": "stdio"
       },

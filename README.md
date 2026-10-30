@@ -25,6 +25,8 @@ export DGSPL_ANAHTAR=4dg_…
 python3 tools/4dgspl_yukle.py teslim --gonder --bekle --indir result
 ```
 
+Real footage without a calibration file: add `--colmap` (8+ cameras at most 45° apart, textured scene).
+
 Rules that matter most:
 - **Background:** pure black world (0, 0, 0).
 - **Materials:** matte.

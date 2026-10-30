@@ -23,7 +23,7 @@ import re
 import sys
 from pathlib import Path
 
-SURUM = "0.1.0"
+SURUM = "0.1.1"
 PROTOKOLLER = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
 BURASI = Path(__file__).resolve().parent
 
@@ -50,7 +50,8 @@ browser and can be watched from any angle. Docs: https://4dgspl.at/en/agents.htm
 
 Input (one folder): cam00.mp4, cam01.mp4 … (4–16 cameras, 8 recommended, same resolution/fps/frame count, synchronized,
 cameras never move) + kalibrasyon.zip with COLMAP cameras.txt (PINHOLE, pixels) and images.txt (world→camera, OpenCV),
-image names cam00.png … Pure black background (0,0,0) for synthetic scenes; matte materials; subject fills 70–85 % of the
+image names cam00.png …. Without a calibration file set colmap=true on upload_project: the server then estimates the
+poses from the images (needs 8+ cameras at most 45° apart and textured scenes; 6 or fewer usually fail). Pure black background (0,0,0) for synthetic scenes; matte materials; subject fills 70–85 % of the
 frame height. The server currently processes up to the first 10 seconds at 15 fps (up to 150 frames). ≤ 50 MB per file.
 
 No cameras? Build the scene in Blender and let the rig script make the capture:
@@ -90,11 +91,15 @@ ARACLAR = [
                                     "quality": {"type": "string", "enum": ["hizli", "yuksek", "en_yuksek"], "default": "hizli",
                                                 "description": "hizli = Fast (free jobs use this), yuksek = High ×3, en_yuksek = Highest ×8"},
                                     "notes": {"type": "string"},
+                                    "colmap": {"type": "boolean", "default": False,
+                                               "description": "No calibration file: let the server estimate camera poses from the images (8+ cameras at most 45° apart, textured scene; often fails on plain backgrounds)"},
                                     "submit": {"type": "boolean", "default": False},
                                     "force": {"type": "boolean", "default": False, "description": "Upload even if the checker reports errors"}}}},
     {"name": "submit_project",
      "description": "Submit an uploaded draft project for processing. Requires DGSPL_ANAHTAR.",
-     "inputSchema": {"type": "object", "required": ["project_id"], "properties": {"project_id": {"type": "string"}}}},
+     "inputSchema": {"type": "object", "required": ["project_id"],
+                     "properties": {"project_id": {"type": "string"},
+                                    "colmap": {"type": "boolean", "description": "Optional: turn automatic calibration from images on or off for this draft"}}}},
     {"name": "project_status",
      "description": "Status of a project: queue position, processing stage and progress, cost estimate for drafts. Poll every "
                     "30–60 s while queued or processing. Requires DGSPL_ANAHTAR.",
@@ -178,7 +183,7 @@ def _arac(ad, g):
     if ad == "upload_project":
         _modul(YUKLE, "4dgspl_yukle.py")
         p = YUKLE.klasoru_yukle(_api(), _anahtar(), os.path.expanduser(g["folder"]), g.get("title"), g.get("quality") or "hizli",
-                                g.get("notes"), bool(g.get("force")))
+                                g.get("notes"), bool(g.get("force")), bool(g.get("colmap")), bool(g.get("submit")))
         metin = f"Project created and uploaded: project_id={p['proje_id']}\nProject page: {p['proje_sayfasi']}"
         if g.get("submit"):
             metin += "\n" + YUKLE.gonder_metni(_cagir("gonder", proje_id=p["proje_id"]))
@@ -188,7 +193,8 @@ def _arac(ad, g):
         return metin
     if ad == "submit_project":
         _modul(YUKLE, "4dgspl_yukle.py")
-        return YUKLE.gonder_metni(_cagir("gonder", proje_id=g["project_id"]))
+        secim = {"colmap": g["colmap"]} if isinstance(g.get("colmap"), bool) else {}
+        return YUKLE.gonder_metni(_cagir("gonder", proje_id=g["project_id"], **secim))
     if ad == "project_status":
         _modul(YUKLE, "4dgspl_yukle.py")
         d = _cagir("durum", proje_id=g["project_id"])

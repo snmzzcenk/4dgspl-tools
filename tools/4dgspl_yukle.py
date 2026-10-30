@@ -15,7 +15,8 @@ Kullanım / Usage:
     python3 4dgspl_yukle.py --durum <proje_id>
     python3 4dgspl_yukle.py --sonuc <proje_id> --indir sonuc
 
-Klasör: cam00.mp4, cam01.mp4 … (ya da cam00_aciklama.mp4) ve isteğe bağlı kalibrasyon.zip / calibration.zip.
+Klasör: cam00.mp4, cam01.mp4 … (ya da cam00_aciklama.mp4) ve kalibrasyon.zip / calibration.zip. Kalibrasyon dosyası yoksa --colmap
+ile sunucu görüntülerden hesaplamayı dener (en az 7–8 kamera, komşular en çok 45°, dokulu sahne).
 Aynı klasörde 4dgspl_kontrol.py varsa yüklemeden önce çalıştırılır; hata varsa yükleme yapılmaz (--zorla ile geçilir).
 Sınırlar: dosya başına 50 MB; ajanla günde 20 proje açma, 10 gönderme; aynı anda en çok 3 proje kuyrukta/işlenmekte.
 Bağımlılık yok (Python 3.8+). MIT lisansı. Ayrıntı: https://4dgspl.at/ajan.html · https://4dgspl.at/en/agents.html
@@ -180,12 +181,15 @@ def sonucu_indir(api, anahtar, pid, hedef):
             f"Result downloaded: {hedef} ({len(s['kareler'])} frames, sahne.json, onizleme.mp4). Project page: {s['proje_sayfasi']}"))
 
 
-def klasoru_yukle(api, anahtar, klasor, baslik=None, kalite="hizli", notlar=None, zorla=False):
+def klasoru_yukle(api, anahtar, klasor, baslik=None, kalite="hizli", notlar=None, zorla=False, colmap=False, gonderilecek=False):
     """Klasörü denetler, proje açar, videoları ve kalibrasyonu yükler; proje_ac yanıtını döndürür. Hata: ApiHatasi."""
     klasor = Path(klasor)
     if not klasor.is_dir():
         raise ApiHatasi(m(f"{klasor} bir klasör değil", f"{klasor} is not a folder"))
     videolar, kalib = klasoru_oku(klasor)
+    if gonderilecek and not kalib and not colmap:   # yükleme boşa gitmesin: sunucu bu projeyi kabul etmez
+        raise ApiHatasi(m("Kalibrasyon dosyası yok (kalibrasyon.zip). Dosya ekleyin ya da sunucunun görüntülerden hesaplaması için --colmap kullanın.",
+                          "No calibration file (kalibrasyon.zip). Add one, or use --colmap to let the server estimate it from the images."))
     etiketler = sorted(videolar)
     if not etiketler or etiketler != [f"cam{i:02d}" for i in range(len(etiketler))]:
         raise ApiHatasi(m(f"{klasor} içinde cam00'dan başlayan ardışık videolar yok: {etiketler}",
@@ -210,7 +214,7 @@ def klasoru_yukle(api, anahtar, klasor, baslik=None, kalite="hizli", notlar=None
                               f"{v.name} is larger than 50 MB; lower the bitrate (e.g. ffmpeg -crf 23)."))
 
     p = cagir(api, anahtar, "proje_ac", baslik=baslik or klasor.resolve().name, kamera_sayisi=len(etiketler),
-              fps=round(fps) if fps else None, kalite=kalite, notlar=notlar)
+              fps=round(fps) if fps else None, kalite=kalite, notlar=notlar, colmap=bool(colmap and not kalib))
     pid = p["proje_id"]
     print(m(f"Proje açıldı: {pid} · {p['proje_sayfasi']}", f"Project created: {pid} · {p['proje_sayfasi']}"))
     isler = [("video", e, videolar[e]) for e in etiketler] + ([("kalibrasyon", None, kalib)] if kalib else [])
@@ -238,6 +242,8 @@ def main():
     ap.add_argument("--baslik", "--title", help="proje adı / project title (varsayılan: klasör adı)")
     ap.add_argument("--kalite", "--quality", choices=["hizli", "yuksek", "en_yuksek"], default="hizli")
     ap.add_argument("--notlar", "--notes")
+    ap.add_argument("--colmap", action="store_true",
+                    help="kalibrasyon dosyası yoksa sunucu görüntülerden hesaplasın / no calibration file: let the server estimate it from the images")
     ap.add_argument("--gonder", "--submit", action="store_true", help="yükledikten sonra işleme gönder / submit after upload")
     ap.add_argument("--bekle", "--wait", action="store_true", help="bitmesini bekle / wait for processing")
     ap.add_argument("--bekle-dk", "--wait-min", type=int, default=180)
@@ -269,7 +275,7 @@ def main():
             return
         if not a.klasor:
             ap.error(m("klasör gerekli (ya da --projeler / --durum / --sonuc)", "folder required (or --projeler / --durum / --sonuc)"))
-        p = klasoru_yukle(a.api, anahtar, a.klasor, a.baslik, a.kalite, a.notlar, a.zorla)
+        p = klasoru_yukle(a.api, anahtar, a.klasor, a.baslik, a.kalite, a.notlar, a.zorla, a.colmap, a.gonder)
         pid = p["proje_id"]
         if not a.gonder:
             print(m(f"Yüklendi. Göndermek için: panelden \"İşleme gönder\" ya da bu komutu --gonder ile çalıştırın. {p['proje_sayfasi']}",

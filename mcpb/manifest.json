@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "4dgspl",
   "display_name": "4dgspl.at — 4D Gaussian Splatting",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Turn synchronized multi-camera video or a Blender multi-camera render into 4D Gaussian Splatting (4DGS) on 4dgspl.at: validate, upload, process, download.",
   "long_description": "4dgspl.at converts synchronized video of the same moment from 4–16 cameras (or virtual cameras in Blender, Unreal or Unity) plus COLMAP calibration into a 4D Gaussian Splatting sequence that plays in the browser and can be watched from any angle. This server lets an AI assistant explain the capture rules, validate a delivery folder, create a project, upload the videos and calibration, submit it, follow its progress and download the per-frame 3DGS PLY files. New accounts get 5 free jobs.",
   "author": {"name": "4dgspl.at", "email": "hello@4dgspl.at", "url": "https://4dgspl.at/en/"},
