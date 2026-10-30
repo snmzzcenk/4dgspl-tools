@@ -62,4 +62,5 @@ If the user prefers tools over shell commands, install the MCP server in `tools/
 - Generate camera views with text-to-video models; they have no consistent geometry or known poses.
 - Use a grey or coloured background in synthetic captures.
 - Move or animate the cameras.
+- Spin the model on a turntable or rotate it to show every side; the camera ring already provides the angles. Only the requested motion, body broadly facing cam00.
 - Put the raw Mixamo FBX (or any third-party asset) in the delivery or a public place. Rendering it is fine.
