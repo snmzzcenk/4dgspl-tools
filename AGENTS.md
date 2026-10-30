@@ -53,6 +53,10 @@ Use this workflow when a user asks for any of the following:
    - One `compressed.ply` 3D Gaussian scene per frame (PlayCanvas format), plus `sahne.json` and an MP4 preview.
    - The project page has a player, a share link and a ZIP download.
 
+## Agent skill
+
+For a GLB 3D animation, video or still image from the same scene as well as 4DGS, follow [`skills/4dgs-blender/SKILL.md`](skills/4dgs-blender/SKILL.md).
+
 ## MCP server (optional)
 
 If the user prefers tools over shell commands, install the MCP server in `tools/4dgspl_mcp.py` (see README → MCP server). It exposes the same workflow as `get_4dgs_guide`, `check_delivery`, `upload_project`, `submit_project`, `project_status`, `list_projects` and `download_result`; the key goes into the server's environment as `DGSPL_ANAHTAR`, never into chat.

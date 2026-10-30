@@ -34,6 +34,10 @@ Rules that matter most:
 
 Details: [agent guide](https://4dgspl.at/en/agents.html) · [capture guide](https://4dgspl.at/en/capture.html) · [examples](https://4dgspl.at/en/examples.html) · [llms.txt](https://4dgspl.at/llms.txt)
 
+## Agent skill
+
+[`skills/4dgs-blender/SKILL.md`](skills/4dgs-blender/SKILL.md) packages the whole workflow as an agent skill: GLB 3D animation, video, still image and 4DGS videos from one Blender scene. To install it in Claude Code, copy the folder into `~/.claude/skills/`. Agents that read `SKILL.md` from their own skills folder can use the same files.
+
 ## MCP server
 
 ```bash
